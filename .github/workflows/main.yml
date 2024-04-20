@@ -26,12 +26,10 @@ jobs:
     - name: Upload Release Artifact
       id: upload_artifact
       uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/dist/order-speech-plugin.zip
-          asset_name: order-speech-plugin.zip
-          asset_content_type: application/zip
-
-Action の名前
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/dist/order-speech-plugin.zip
+        asset_name: order-speech-plugin.zip
+        asset_content_type: application/zip
