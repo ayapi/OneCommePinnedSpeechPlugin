@@ -26,6 +26,6 @@
     "zip-webpack-plugin": "^4.0.1"
   },
   "dependencies": {
-    "@onecomme.com/onesdk": "^0.0.4"
+    "@onecomme.com/onesdk": "^5.2.1"
   }
 }
