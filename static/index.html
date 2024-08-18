@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OneComme Order Speech Extender Plugin</title>
+    <title>OneComme ピン留め読み上げ拡張プラグイン</title>
     <link rel="stylesheet" href="https://classless.de/classless.css" />
     <link href="https://cdn.jsdelivr.net/npm/vue-toast-notification@3/dist/theme-sugar.css" rel="stylesheet">
     <style>
@@ -14,62 +14,25 @@
   </head>
   <body hidden>
     <div id="app" class="app">
-      <template v-if="!loaded">Loading...</template>
+      <template v-if="!loaded">読み込み中...</template>
       <template v-if="loaded">
         <form>
           <fieldset>
             <legend>
-              <label for="joined-player">新規参加待ち読み上げ</label>
+              <label for="enable-pinned-speech">ピン留めコメント読み上げ</label>
               <input
-                id="joined-player"
+                id="enable-pinned-speech"
                 type="checkbox"
-                v-model="state.joinedPlayers"
+                v-model="state.enablePinnedSpeech"
               />
             </legend>
-            <div :hidden="!state.joinedPlayers">
+            <div :hidden="!state.enablePinnedSpeech">
               <p>
-                <label for="joined-name-format">名前フォーマット</label>
+                <label for="pinned-speech-template">読み上げテンプレート</label>
                 <input
-                  id="joined-name-format"
+                  id="pinned-speech-template"
                   type="text"
-                  v-model="state.joinedPlayersTemplate[0]"
-                />
-              </p>
-              <p>
-                <label for="joined-call-format">読み出しフォーマット</label>
-                <input
-                  id="joined-call-format"
-                  type="text"
-                  v-model="state.joinedPlayersTemplate[1]"
-                />
-              </p>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>
-              <label for="call-players">プレイ中呼び出し</label>
-              <input
-                id="call-players"
-                type="checkbox"
-                v-model="state.callPlayers"
-              />
-            </legend>
-            <div :hidden="!state.callPlayers">
-              <p>
-                <label for="player-name-format">名前フォーマット</label>
-                <input
-                  id="player-name-format"
-                  type="text"
-                  v-model="state.callPlayersTemplate[0]"
-                />
-              </p>
-              <p>
-                <label for="player-call-format">読み出しフォーマット</label>
-                <input
-                  id="player-call-format"
-                  type="text"
-                  v-model="state.callPlayersTemplate[1]"
+                  v-model="state.pinnedSpeechTemplate"
                 />
               </p>
             </div>
@@ -81,6 +44,5 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-toast-notification@3"></script>
     <script src="./script.js"></script>
-    <!-- localhost:11180/plugins/com.onecomme.plugin-sample/index.html -->
   </body>
 </html>

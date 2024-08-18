@@ -1,38 +1,44 @@
 import { OnePlugin, PluginRequest } from "@onecomme.com/onesdk/types/Plugin"
 
+interface CommentData {
+  id: string;
+  name: string;
+  displayName: string;
+  profileImage?: string;
+  comment: string;
+  hasGift: boolean;
+  isOwner: boolean;
+  isModerator: boolean;
+  isMember: boolean;
+  isFirstTime: boolean;
+  badges: Array<{
+    label: string;
+    url?: string;
+  }>;
+  paidText?: string;
+}
+
+interface Comment {
+  service: string;
+  name: string;
+  id: string;
+  data: CommentData;
+}
+
 const plugin: OnePlugin = {
-  name: '参加管理 読み上げ拡張プラグイン', // @required plugin name
-  uid: 'com.onecomme.order-speech-extender', // @required unique plugin id
+  name: 'ピン留め 読み上げ拡張プラグイン', // @required plugin name
+  uid: 'com.onecomme.pinned-speech-extender', // @required unique plugin id
   version: '0.0.1', // @required semver version
-  author: 'OneComme', // @required author name
-  url: 'http://localhost:11180/plugins/com.onecomme.order-speech-extender/index.html', // @optional link (ex. documentation link)
-  permissions: ['waitingList'], // @required　https://onecomme.com/docs/developer/websocket-api/#%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%81%AE%E7%A8%AE%E9%A1%9E%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF
+  author: 'ayapi', // @required author name
+  url: 'http://localhost:11180/plugins/com.onecomme.pinned-speech-extender/index.html', // @optional link (ex. documentation link)
+  permissions: ['pinned'], // @required　https://onecomme.com/docs/developer/websocket-api/#%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%81%AE%E7%A8%AE%E9%A1%9E%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF
   defaultState: { // @optional key-value custom state
-    callPlayers: true,
-    callPlayersTemplate: ['{name}さん', '参加お願いします'],
-    joinedPlayers: true,
-    joinedPlayersTemplate: ['{name}さん', 'が参加待ちしました'],
+    enablePinnedSpeech: true, // ピン留めの読み上げを有効にするオプション
+    pinnedSpeechTemplate: '{comment.data.displayName}さんのコメント: {comment.data.comment}', // ピン留めの読み上げテンプレート
   },
 
-  // custom property
-  players: new Map(),
-  waitings: new Map(),
-
-  /**
-   * 
-   * @param { dir: string, filepath: string, store: ElectronStore} param
-   * dir: plugin directory path
-   * filepath: this script's path
-   * store: ElectronStore Instance  https://github.com/sindresorhus/electron-store?tab=readme-ov-file#instance
-   */
   init({ dir, store }, initialData) {
     this.store = store
-    const {
-      newWaitingMap,
-      newPlayerMap
-    } = this.parseOrders(initialData.waitingList)
-    this.waitings = newWaitingMap
-    this.players = newPlayerMap
   },
   /**
    * called on exit or when activated
@@ -40,30 +46,6 @@ const plugin: OnePlugin = {
    */
   destroy() {
 
-  },
-  parseOrders(newWaitingList: any[]) {
-    const newOrders: any[] = []
-    const newPlayers: any[] = []
-    const newWaitingMap = new Map()
-    const newPlayerMap = new Map()
-    newWaitingList.forEach((item) => {
-      newWaitingMap.set(item.id, item)
-      if (!this.waitings.has(item.id)) {
-        newOrders.push(item)
-      }
-      if (item.playing) {
-        newPlayerMap.set(item.id, item)
-        if (!this.players.has(item.id)) {
-          newPlayers.push(item)
-        }
-      }
-    })
-    return {
-      newOrders,
-      newPlayers,
-      newWaitingMap,
-      newPlayerMap
-    }
   },
   speech(text: string) {
     fetch('http://127.0.0.1:11180/api/speech', {
@@ -85,34 +67,29 @@ const plugin: OnePlugin = {
    */
   subscribe(type, ...args) {
     switch (type) {
-      case 'waitingList': {
-        // 
-        const newWaitingList = args[0]
-        const {
-          newOrders,
-          newPlayers,
-          newWaitingMap,
-          newPlayerMap
-        } = this.parseOrders(newWaitingList)
-        this.waitings = newWaitingMap
-        this.players = newPlayerMap
-
-        if (newOrders.length && this.store.get('joinedPlayers')) {
-          const tmpl = this.store.get('joinedPlayersTemplate')
-          const text = newOrders.map((order: any) => {
-            return tmpl[0].replaceAll('{name}', order.username)
-          }).join(', ') + `, ${tmpl[1]}`
-          this.speech(text)
-        }
-        if (newPlayers.length && this.store.get('callPlayers')) {
-          const tmpl = this.store.get('callPlayersTemplate')
-          const text = newPlayers.map((order: any) => {
-            return tmpl[0].replaceAll('{name}', order.username)
-          }).join(', ') + `, ${tmpl[1]}`
-          this.speech(text)
+      case 'pinned': {
+        const pinnedData = args[0] as Comment | null;
+        if (pinnedData && this.store.get('enablePinnedSpeech')) {
+          const tmpl = this.store.get('pinnedSpeechTemplate');
+          const text = this.formatTemplate(tmpl, pinnedData.data);
+          this.speech(text);
         }
       }
     }
+  },
+
+  formatTemplate(template: string, data: CommentData): string {
+    return template.replace(/\{comment\.data\.(\w+)\}/g, (match, key: string) => {
+      const value = data[key as keyof CommentData];
+      if (typeof value === 'string') {
+        return value;
+      } else if (typeof value === 'boolean') {
+        return value.toString();
+      } else if (Array.isArray(value)) {
+        return JSON.stringify(value);
+      }
+      return match; // 対応する値がない場合は元のマッチをそのまま返す
+    });
   },
 
   /**

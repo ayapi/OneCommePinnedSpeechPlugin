@@ -1,5 +1,5 @@
 {
-  "name": "order-speech-plugin",
+  "name": "onecomme-pinned-speech-plugin",
   "version": "0.0.1",
   "description": "",
   "main": "public/plugin.js",
@@ -12,7 +12,7 @@
     "わんコメ",
     "onecomme"
   ],
-  "author": "astie",
+  "author": "ayapi",
   "type": "commonjs",
   "license": "ISC",
   "devDependencies": {
