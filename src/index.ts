@@ -71,7 +71,8 @@ const plugin: OnePlugin = {
         const pinnedData = args[0] as Comment | null;
         if (pinnedData && this.store.get('enablePinnedSpeech')) {
           const tmpl = this.store.get('pinnedSpeechTemplate');
-          const text = this.formatTemplate(tmpl, pinnedData.data);
+          let text = this.formatTemplate(tmpl, pinnedData.data);
+          text = this.removeHtmlTags(text);  // HTMLタグを除去
           this.speech(text);
         }
       }
@@ -90,6 +91,11 @@ const plugin: OnePlugin = {
       }
       return match; // 対応する値がない場合は元のマッチをそのまま返す
     });
+  },
+
+  // 新しい関数を追加
+  removeHtmlTags(text: string): string {
+    return text.replace(/<[^>]*>/g, '');
   },
 
   /**
