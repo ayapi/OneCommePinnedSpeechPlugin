@@ -6,7 +6,7 @@
 
 ## プラグインの導入
 
-[Release](https://github.com/YourUsername/OneCommePinnedSpeechPlugin/releases) ページから「onecomme-pinned-speech-plugin.zip」をダウンロードします。
+[Release](https://github.com/ayapi/OneCommePinnedSpeechPlugin/releases) ページから「onecomme-pinned-speech-plugin.zip」をダウンロードします。
 
 zipを展開し、わんコメのプラグインフォルダに「onecomme-pinned-speech-plugin」フォルダを設置します。
 
