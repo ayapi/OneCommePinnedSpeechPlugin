@@ -1,4 +1,6 @@
 import { OnePlugin, PluginRequest } from "@onecomme.com/onesdk/types/Plugin"
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 interface CommentData {
   id: string;
@@ -48,6 +50,7 @@ const plugin: OnePlugin = {
 
   },
   speech(text: string) {
+    this.logToFile(`音声リクエスト: ${text}`);
     fetch('http://127.0.0.1:11180/api/speech', {
       method: 'POST',
       headers: {
@@ -135,6 +138,18 @@ const plugin: OnePlugin = {
       code: 404,
       response: {}
     }
+  },
+  async logToFile(message: string) {
+    // const logDir = path.join('C:', 'Users', 'ayapi', 'AppData', 'Roaming', 'onecomme', 'logs');
+    // const logFilePath = path.join(logDir, 'pinned_plugin_debug_log.txt');
+
+    // try {
+    //   await fs.mkdir(logDir, { recursive: true });
+    //   const logContent = `${new Date().toISOString()} - ${message}\n`;
+    //   await fs.appendFile(logFilePath, logContent);
+    // } catch (error) {
+    //   console.error('ログの書き込みに失敗しました:', error);
+    // }
   }
 }
 module.exports = plugin
