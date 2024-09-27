@@ -30,7 +30,7 @@ interface Comment {
 const plugin: OnePlugin = {
   name: 'ピン留め 読み上げ拡張プラグイン', // @required plugin name
   uid: 'com.onecomme.pinned-speech-extender', // @required unique plugin id
-  version: '1.0.3', // @required semver version
+  version: '1.0.4', // @required semver version
   author: 'ayapi', // @required author name
   url: 'http://localhost:11180/plugins/com.onecomme.pinned-speech-extender/index.html', // @optional link (ex. documentation link)
   permissions: ['pinned'], // @required　https://onecomme.com/docs/developer/websocket-api/#%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%81%AE%E7%A8%AE%E9%A1%9E%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF
@@ -50,14 +50,15 @@ const plugin: OnePlugin = {
 
   },
   speech(text: string) {
-    this.logToFile(`音声リクエスト: ${text}`);
+    const adjustedText = this.adjustSpeechSpeed(text);
+    this.logToFile(`音声リクエスト: ${adjustedText}`);
     fetch('http://127.0.0.1:11180/api/speech', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        text
+        text: adjustedText
       })
     }).catch((e) => {
       console.error(e)
@@ -96,9 +97,19 @@ const plugin: OnePlugin = {
     });
   },
 
-  // 新しい関数を追加
   removeHtmlTags(text: string): string {
-    return text.replace(/<[^>]*>/g, '').replace(/。/g, '、');
+    return text.replace(/<[^>]*>/g, '').replace(/[。]/g, '、').replace(/[\r\n]/g, '');
+  },
+
+  adjustSpeechSpeed(text: string): string {
+    const length = text.length;
+    let speed = 108; // デフォルトの速度
+
+    if (length >= 70) {
+      speed = Math.min(140, 108 + Math.floor((length - 70) / 3));
+    }
+
+    return `速度(${speed})${text}`;
   },
 
   /**
