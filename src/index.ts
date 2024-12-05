@@ -106,7 +106,7 @@ const plugin: OnePlugin = {
     let speed = 108; // デフォルトの速度
 
     if (length >= 70) {
-      speed = Math.min(140, 108 + Math.floor((length - 70) / 3));
+      speed = Math.min(130, 108 + Math.floor((length - 70) / 3));
     }
 
     return `速度(${speed})${text}`;
