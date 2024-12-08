@@ -1,6 +1,7 @@
 import { OnePlugin, PluginRequest } from "@onecomme.com/onesdk/types/Plugin"
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as cheerio from 'cheerio';
 
 interface CommentData {
   id: string;
@@ -73,6 +74,7 @@ const plugin: OnePlugin = {
     switch (type) {
       case 'pinned': {
         const pinnedData = args[0] as Comment | null;
+        this.logToFile(JSON.stringify(pinnedData));
         if (pinnedData && this.store.get('enablePinnedSpeech')) {
           const tmpl = this.store.get('pinnedSpeechTemplate');
           let text = this.formatTemplate(tmpl, pinnedData.data);
@@ -98,7 +100,21 @@ const plugin: OnePlugin = {
   },
 
   removeHtmlTags(text: string): string {
-    return text.replace(/<[^>]*>/g, '').replace(/[。]/g, '、').replace(/[\r\n]/g, '');
+    // HTMLをパース
+    const $ = cheerio.load(text);
+    
+    // data-lang="ja"を持つspanを検索
+    const jaText = $('span[data-lang="ja"]').text();
+    this.logToFile(`抽出されたテキスト: ${jaText}`);  // デバッグ用
+
+    // 文章の最初と最後の括弧のみを削除
+    let result = jaText.replace(/^[(（]/, '').replace(/[)）]$/, '');
+    this.logToFile(`括弧除去後: ${result}`);  // デバッグ用
+
+    // その他の整形
+    return result
+      .replace(/[。]/g, '、')    // 句点を読点に変換
+      .replace(/[\r\n]/g, '');   // 改行を除去
   },
 
   adjustSpeechSpeed(text: string): string {
@@ -151,16 +167,16 @@ const plugin: OnePlugin = {
     }
   },
   async logToFile(message: string) {
-    // const logDir = path.join('C:', 'Users', 'ayapi', 'AppData', 'Roaming', 'onecomme', 'logs');
-    // const logFilePath = path.join(logDir, 'pinned_plugin_debug_log.txt');
+    const logDir = path.join('C:', 'Users', 'ayapi', 'AppData', 'Roaming', 'onecomme', 'logs');
+    const logFilePath = path.join(logDir, 'pinned_plugin_debug_log.txt');
 
-    // try {
-    //   await fs.mkdir(logDir, { recursive: true });
-    //   const logContent = `${new Date().toISOString()} - ${message}\n`;
-    //   await fs.appendFile(logFilePath, logContent);
-    // } catch (error) {
-    //   console.error('ログの書き込みに失敗しました:', error);
-    // }
+    try {
+      await fs.mkdir(logDir, { recursive: true });
+      const logContent = `${new Date().toISOString()} - ${message}\n`;
+      await fs.appendFile(logFilePath, logContent);
+    } catch (error) {
+      console.error('ログの書き込みに失敗しました:', error);
+    }
   }
 }
 module.exports = plugin

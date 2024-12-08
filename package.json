@@ -1,6 +1,6 @@
 {
   "name": "onecomme-pinned-speech-plugin",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "main": "public/plugin.js",
   "scripts": {
@@ -26,6 +26,7 @@
     "zip-webpack-plugin": "^4.0.1"
   },
   "dependencies": {
-    "@onecomme.com/onesdk": "^5.2.1"
+    "@onecomme.com/onesdk": "^5.2.1",
+    "cheerio": "^1.0.0"
   }
 }
