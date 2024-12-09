@@ -103,12 +103,21 @@ const plugin: OnePlugin = {
     // HTMLをパース
     const $ = cheerio.load(text);
     
-    // data-lang="ja"を持つspanを検索
-    const jaText = $('span[data-lang="ja"]').text();
-    this.logToFile(`抽出されたテキスト: ${jaText}`);  // デバッグ用
+    // まずdata-lang="ja"を持つspanを検索
+    let result = $('span[data-lang="ja"]').text();
+    
+    // 日本語テキストが見つからない場合は、元のテキストをそのまま使用
+    if (!result) {
+      result = text;
+    }
+
+    this.logToFile(`抽出されたテキスト: ${result}`);  // デバッグ用
+
+    // HTMLタグを除去（翻訳なしの通常コメント用）
+    result = result.replace(/<[^>]*>/g, '');
 
     // 文章の最初と最後の括弧のみを削除
-    let result = jaText.replace(/^[(（]/, '').replace(/[)）]$/, '');
+    result = result.replace(/^[(（]/, '').replace(/[)）]$/, '');
     this.logToFile(`括弧除去後: ${result}`);  // デバッグ用
 
     // その他の整形
