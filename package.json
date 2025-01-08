@@ -1,6 +1,6 @@
 {
   "name": "onecomme-pinned-speech-plugin",
-  "version": "1.0.5",
+  "version": "1.0.8",
   "description": "",
   "main": "public/plugin.js",
   "scripts": {

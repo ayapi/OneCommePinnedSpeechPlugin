@@ -31,7 +31,7 @@ interface Comment {
 const plugin: OnePlugin = {
   name: 'ピン留め 読み上げ拡張プラグイン', // @required plugin name
   uid: 'com.onecomme.pinned-speech-extender', // @required unique plugin id
-  version: '1.0.4', // @required semver version
+  version: '1.0.8', // @required semver version
   author: 'ayapi', // @required author name
   url: 'http://localhost:11180/plugins/com.onecomme.pinned-speech-extender/index.html', // @optional link (ex. documentation link)
   permissions: ['pinned'], // @required　https://onecomme.com/docs/developer/websocket-api/#%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%81%AE%E7%A8%AE%E9%A1%9E%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF
@@ -106,19 +106,23 @@ const plugin: OnePlugin = {
     // まずdata-lang="ja"を持つspanを検索
     let result = $('span[data-lang="ja"]').text();
     
-    // 日本語テキストが見つからない場合は、元のテキストをそのまま使用
+    // 見つからない場合は、class="origin"を持つspanを検索
     if (!result) {
-      result = text;
+      result = $('span.origin').text();
     }
-
+    if (!result) {
+      result = $.text();
+    }
+    
     this.logToFile(`抽出されたテキスト: ${result}`);  // デバッグ用
-
-    // HTMLタグを除去（翻訳なしの通常コメント用）
-    result = result.replace(/<[^>]*>/g, '');
 
     // 文章の最初と最後の括弧のみを削除
     result = result.replace(/^[(（]/, '').replace(/[)）]$/, '');
-    this.logToFile(`括弧除去後: ${result}`);  // デバッグ用
+    
+    // @メンション部分を除去（日本語やギリシャ文字等を含むユーザー名に対応）
+    result = result.replace(/@[^\s,、]+\s*(さん)?[、,\s]?/, '');
+    
+    this.logToFile(`括弧・メンション除去後: ${result}`);  // デバッグ用
 
     // その他の整形
     return result
