@@ -31,7 +31,7 @@ interface Comment {
 const plugin: OnePlugin = {
   name: 'ピン留め 読み上げ拡張プラグイン', // @required plugin name
   uid: 'com.onecomme.pinned-speech-extender', // @required unique plugin id
-  version: '1.0.8', // @required semver version
+  version: '1.0.9', // @required semver version
   author: 'ayapi', // @required author name
   url: 'http://localhost:11180/plugins/com.onecomme.pinned-speech-extender/index.html', // @optional link (ex. documentation link)
   permissions: ['pinned'], // @required　https://onecomme.com/docs/developer/websocket-api/#%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%81%AE%E7%A8%AE%E9%A1%9E%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF
