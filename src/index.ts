@@ -79,6 +79,7 @@ const plugin: OnePlugin = {
           const tmpl = this.store.get('pinnedSpeechTemplate');
           let text = this.formatTemplate(tmpl, pinnedData.data);
           text = this.removeHtmlTags(text);  // HTMLタグを除去
+          text = this.formatHelloMessage(text);
           this.speech(text);
         }
       }
@@ -128,6 +129,17 @@ const plugin: OnePlugin = {
     return result
       .replace(/[。]/g, '、')    // 句点を読点に変換
       .replace(/[\r\n]/g, '');   // 改行を除去
+  },
+
+  formatHelloMessage(text: string): string {
+    const helloPattern = /^が「(.+)」と言いました$/;
+    const match = text.match(helloPattern);
+    
+    if (match) {
+      return match[1];
+    }
+    
+    return text;
   },
 
   adjustSpeechSpeed(text: string): string {
