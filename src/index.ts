@@ -132,7 +132,7 @@ const plugin: OnePlugin = {
   },
 
   formatHelloMessage(text: string): string {
-    const helloPattern = /^が「(.+)」と言いました$/;
+    const helloPattern = /^さんが「(.+)」と言いました$/;
     const match = text.match(helloPattern);
     
     if (match) {
